@@ -4,7 +4,7 @@
     <main>
         <section>
             <h1>Privacy Policy</h1>
-            <p class="top-margin-large">Questa informativa descrive in modo sintetico il trattamento dei dati raccolti tramite iscrizioni, pagamenti, comunicazioni e moduli del sito Walking Francigena Ultra Marathon.</p>
+            <p class="top-margin-large">Questa informativa descrive in modo sintetico il trattamento dei dati raccolti tramite iscrizioni, pagamenti, comunicazioni e moduli del sito Trail degli Eroi.</p>
         </section>
 
         <section class="grid-2">
@@ -22,7 +22,7 @@
             </div>
             <div class="card">
                 <h2>Diritti</h2>
-                <p class="top-margin-large">Per richieste di accesso, rettifica o cancellazione puoi scrivere a <a class="hyperlink" href="mailto:info@francigenaultramarathon.com">info@francigenaultramarathon.com</a>.</p>
+                <p class="top-margin-large">Per richieste di accesso, rettifica o cancellazione puoi scrivere a <a class="hyperlink" href="mailto:info@traildeglieroi.it">info@traildeglieroi.it</a>.</p>
             </div>
         </section>
     </main>

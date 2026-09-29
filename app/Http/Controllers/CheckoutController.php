@@ -27,7 +27,7 @@ class CheckoutController extends Controller
             'tickets.*.first_name' => 'required|string|max:255',
             'tickets.*.last_name' => 'required|string|max:255',
             'tickets.*.codice_fiscale' => 'nullable|string|max:16', 
-            'tickets.*.route_choice' => 'required|in:Grande Sfida 130 km,Tratte intermedie,Tratte brevi',
+            'tickets.*.route_choice' => 'required|in:Trail degli Eroi 46K,Sky degli Eroi 27K,Downhill degli Eroi 12K,Santa Felicita 14K',
             'tickets.*.dob' => 'required|date',
             'tickets.*.birth_place' => 'required|string|max:255',
             'tickets.*.residence_address' => 'required|string|max:255',
@@ -205,7 +205,7 @@ class CheckoutController extends Controller
             'amount' => (int) round($order->total_amount * 100),
             'currency' => 'eur',
             'payment_method_types' => ['card'],
-            'description' => 'Iscrizione Francigena Ultra Marathon - Ordine ' . $order->group_code,
+            'description' => 'Iscrizione Trail degli Eroi - Ordine ' . $order->group_code,
             'receipt_email' => $firstTicket?->email,
             'metadata' => [
                 'order_id' => (string) $order->id,
@@ -337,7 +337,7 @@ class CheckoutController extends Controller
         }
 
         $pdf = Pdf::loadView('pdf.ticket', compact('ticket'));
-        $fileName = 'Biglietto_Francigena_' . str_replace(' ', '_', $ticket->last_name) . '.pdf';
+        $fileName = 'Biglietto_Trail_degli_Eroi_' . str_replace(' ', '_', $ticket->last_name) . '.pdf';
         
         return $pdf->download($fileName);
     }

@@ -10,9 +10,12 @@
         </svg>
     </div>
 
-    <div class="logo">
-        <h5 style="color: white;">FRANCIGENA ULTRA MARATHON</h5>
-    </div>
+    <a class="logo" href="/" aria-label="Trail degli Eroi - Homepage">
+        <img src="/images/trail-eroi/logo-mark.svg" alt="Trail degli Eroi">
+        <span class="logo-wordmark"><strong>TRAIL</strong> DEGLI EROI</span>
+    </a>
+
+    <a class="nav-cta" href="/iscrizione">Iscriviti</a>
 </nav>
 
 <div id="sideMenu" class="side-menu">
@@ -25,9 +28,10 @@
 
     <a class="hamburger-menu-link" href="/">Homepage</a>
     <a class="hamburger-menu-link" href="/iscrizione">Iscrizione</a>
+    <a class="hamburger-menu-link" href="/#gare">Le gare 2026</a>
     <a class="hamburger-menu-link" href="/#programma">Programma</a>
-    <a class="hamburger-menu-link" href="/#percorsi">Tratte</a>
     <a class="hamburger-menu-link" href="/regolamento">Regolamento</a>
     <a class="hamburger-menu-link" href="/contattaci">Contattaci</a>
-    <a class="hamburger-menu-link" href="/partnership">Partnership</a>
+    <a class="hamburger-menu-link" href="/#storia">La storia del Grappa</a>
+    <a class="hamburger-menu-link" href="/partnership">Partner</a>
 </div>

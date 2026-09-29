@@ -1,22 +1,22 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;400;500;600;700;800;900&display=swap');
 
 :root {
-  --primary: #c64735;
-  --primary-hover: #9e3027;
-  --primary-soft: #d8ad4a;
+  --primary: #a91f2c;
+  --primary-hover: #7f1420;
+  --primary-soft: #e8c4bf;
 
-  --bg-main: #f6f0e4;
-  --bg-secondary: #dfe8dc;
+  --bg-main: #f4efe5;
+  --bg-secondary: #ded7ca;
   --bg-card: #FFFFFF;
-  --bg-alt: #d8ad4a;
+  --bg-alt: #a91f2c;
 
-  --text-main: #191d2f;
-  --text-secondary: #25386a;
+  --text-main: #181815;
+  --text-secondary: #20201c;
   --text-muted: #626569;
   --text-disabled: #8C8C8C;
   --text-white: #FFFFFF;
 
-  --border-light: #ded4c2;
+  --border-light: #d2c9ba;
   --font-base: 'Barlow Condensed', sans-serif;
   --radius-small: 6px;
   --radius-big: 12px;
@@ -263,18 +263,99 @@ section {
 }
 
 .home-hero {
-  background: linear-gradient(rgba(25, 29, 47, 0.18), rgba(25, 29, 47, 0.72)),
-    url(images/francigena/hero-1.jpg);
+  background: linear-gradient(90deg, rgba(5, 15, 8, 0.94) 0%, rgba(5, 15, 8, 0.64) 50%, rgba(5, 15, 8, 0.18) 100%),
+    url('https://static.wixstatic.com/media/7f418a_af22e500d2214084bc087d3ab8a8f556~mv2.jpg/v1/fill/w_1800,h_1100,al_c,q_85,enc_avif,quality_auto/7f418a_af22e500d2214084bc087d3ab8a8f556~mv2.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  padding-top: 136px;
+  padding-top: 80px;
 }
 
 .hero-title {
   font-size: 84px;
   font-weight: 900;
 }
+
+/* Maunik identity */
+.maunik-hero__content {
+  align-items: flex-start;
+  max-width: 920px;
+  justify-content: center;
+  min-height: 76vh;
+}
+
+.hero-kicker,
+.section-kicker {
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.maunik-hero .hero-title {
+  color: #fff;
+  line-height: .86;
+  letter-spacing: -.035em;
+}
+
+.maunik-hero .hero-title span { color: var(--primary); }
+.maunik-hero .hero-copy { font-size: 24px; max-width: 650px; }
+
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.btn-outline { background: transparent; border-color: rgba(255,255,255,.65); }
+.btn-outline:hover { background: #fff; border-color: #fff; color: var(--text-main); }
+
+.race-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--primary);
+  color: var(--text-main);
+  padding: 26px 8%;
+}
+
+.race-strip > div { padding: 4px 28px; border-left: 1px solid rgba(18,22,17,.22); }
+.race-strip > div:first-child { border-left: 0; }
+.race-strip strong, .race-strip span { display: block; }
+.race-strip strong { font-size: 26px; line-height: 1; }
+.race-strip span { font-size: 14px; margin-top: 6px; text-transform: uppercase; letter-spacing: .08em; }
+
+.maunik-intro { background: #fff; }
+.maunik-intro h2 { margin-top: 12px; }
+.maunik-poster-card { position: relative; background: #071108; min-height: 510px; overflow: hidden; color: #fff; }
+.poster-visual { position: absolute; inset: 0; padding: 42px; background: radial-gradient(circle at 90% 15%, rgba(143,220,76,.25), transparent 28%), repeating-linear-gradient(125deg, transparent 0 38px, rgba(143,220,76,.08) 39px 40px); }
+.poster-visual img { width: 68px; height: auto; }
+.poster-visual p { color: var(--primary); font-weight: 800; letter-spacing: .16em; margin-top: 40px; }
+.poster-visual strong { display: block; font-size: 72px; line-height: .72; letter-spacing: -.03em; margin-top: 20px; }
+.poster-visual span { position: absolute; right: 34px; top: 42px; writing-mode: vertical-rl; color: var(--primary); font-weight: 700; letter-spacing: .14em; }
+.poster-caption { position: absolute; right: 0; bottom: 0; display: flex; align-items: baseline; gap: 10px; background: var(--primary); padding: 18px 24px; text-transform: uppercase; font-weight: 700; }
+.poster-caption .numero { font-size: 38px; line-height: 1; }
+
+.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 50px; }
+.section-heading h2 { margin-top: 10px; }
+.section-heading > p { max-width: 480px; }
+
+.race-section { background: #0b130d; color: #fff; }
+.race-card { min-height: 560px; padding: 34px; display: flex; flex-direction: column; justify-content: space-between; background-size: cover; background-position: center; position: relative; overflow: hidden; }
+.race-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,10,6,.08), rgba(5,10,6,.94)); }
+.race-card--solo { background-image: url('https://static.wixstatic.com/media/7f418a_af22e500d2214084bc087d3ab8a8f556~mv2.jpg/v1/fill/w_1000,h_900,al_c,q_85,enc_avif,quality_auto/7f418a_af22e500d2214084bc087d3ab8a8f556~mv2.jpg'); }
+.race-card--relay { background-image: url('https://static.wixstatic.com/media/7f418a_1a1e105b39784a819c16a479065cbda1~mv2.jpg/v1/fill/w_1000,h_900,al_c,q_85,enc_avif,quality_auto/7f418a_1a1e105b39784a819c16a479065cbda1~mv2.jpg'); }
+.race-card > * { position: relative; z-index: 1; }
+.race-card .route-badge { align-self: flex-start; background: var(--primary); color: var(--text-main); border: 0; }
+.race-card__number { color: var(--primary); font-size: 74px; line-height: .9; font-weight: 900; }
+.race-card__body h3 { font-size: 48px; }
+.race-card__body p:not(.race-card__number) { max-width: 520px; }
+
+.maunik-manifesto { background: var(--primary); color: var(--text-main); padding-right: 26%; }
+.maunik-manifesto .section-kicker { color: #214b1d; }
+.maunik-manifesto h2 { font-size: 52px; margin-top: 14px; }
+.maunik-manifesto .btn-2 { background: #101710; color: #fff; border-color: #101710; }
+
+.card-index { display: inline-block; color: var(--primary-hover); font-weight: 800; letter-spacing: .12em; margin-bottom: 44px; }
+.quick-links { padding-top: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
+.quick-links a { display: flex; justify-content: space-between; padding: 28px; background: var(--text-secondary); color: #fff; text-decoration: none; font-size: 24px; text-transform: uppercase; }
+.quick-links a:hover { background: var(--primary); color: var(--text-main); }
+.dark-bg { background: #09100a; }
 
 .hero-copy {
   max-width: 720px;
@@ -665,7 +746,103 @@ section {
 }
 
 .faq-question:hover {
-  background: #f1eadb;
+  background: #eee7dc;
+}
+
+/* Trail degli Eroi — visual system */
+.eroi-theme { color: var(--text-main); }
+.eroi-theme h1,
+.eroi-theme h2,
+.eroi-theme h3 { text-wrap: balance; }
+.eroi-theme h2 { font-family: 'Source Serif 4', serif; font-weight: 600; letter-spacing: -.025em; }
+.eroi-theme .section-kicker,
+.eroi-theme .hero-kicker { color: #c23a46; }
+.eroi-theme .btn { font-weight: 800; letter-spacing: .06em; }
+
+.eroi-hero {
+  background-image: linear-gradient(90deg, rgba(14,14,13,.92) 0%, rgba(14,14,13,.67) 43%, rgba(14,14,13,.16) 80%), url('/images/trail-eroi/hero-monte-grappa.png');
+  background-position: center;
+  min-height: 100vh;
+}
+.eroi-hero__content { align-items: flex-start; justify-content: center; min-height: calc(100vh - 112px); max-width: 980px; }
+.eroi-hero .hero-title { color: #f4efe5; font-size: clamp(64px, 8.2vw, 124px); line-height: .78; letter-spacing: -.045em; }
+.eroi-hero .hero-title span { color: #c23a46; }
+.eroi-hero .hero-copy { max-width: 640px; font-size: 24px; }
+.eroi-hero .btn-outline { border-color: rgba(244,239,229,.65); color: #fff; }
+.eroi-hero .btn-outline:hover { color: #181815; }
+
+.eroi-theme .race-strip { background: #a91f2c; color: #fff; padding-block: 24px; }
+.eroi-theme .race-strip > div { border-color: rgba(255,255,255,.22); }
+.eroi-theme .race-strip strong { font-size: 24px; }
+.eroi-theme .race-strip span { opacity: .76; }
+
+.eroi-intro { background: #f4efe5; gap: 8vw; }
+.eroi-intro h2 { font-size: clamp(38px, 4vw, 64px); margin-top: 14px; }
+.eroi-poster-card { position: relative; min-height: 560px; overflow: hidden; color: #f4efe5; background: #1e201e; border: 1px solid rgba(24,24,21,.12); }
+.eroi-poster-card .poster-visual { background: linear-gradient(145deg, transparent 60%, rgba(169,31,44,.8)), repeating-linear-gradient(128deg, transparent 0 35px, rgba(244,239,229,.045) 36px 37px); }
+.eroi-poster-card .poster-visual img { width: 72px; }
+.eroi-poster-card .poster-visual p { color: #cf5963; }
+.eroi-poster-card .poster-visual strong { font-family: 'Source Serif 4', serif; font-size: clamp(64px, 6vw, 94px); line-height: .72; }
+.eroi-poster-card .poster-visual span { color: #d8a3a0; }
+.eroi-poster-card .poster-caption { background: #a91f2c; color: #fff; }
+
+.eroi-races { background: #181815; padding-bottom: 110px; }
+.eroi-races .section-heading h2 { font-size: clamp(44px, 5vw, 72px); }
+.race-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid rgba(255,255,255,.16); border-left: 1px solid rgba(255,255,255,.16); }
+.eroi-race-card { min-height: 470px; padding: 34px; display: flex; flex-direction: column; justify-content: space-between; background: #23231f; border-right: 1px solid rgba(255,255,255,.16); border-bottom: 1px solid rgba(255,255,255,.16); transition: transform .25s ease, background .25s ease; }
+.eroi-race-card:hover { background: #292924; transform: translateY(-4px); }
+.eroi-race-card--featured { background: #34352f; }
+.eroi-race-card--red { background: #a91f2c; }
+.eroi-race-card--red:hover { background: #941925; }
+.eroi-race-card--light { background: #f4efe5; color: #181815; }
+.eroi-race-card--light:hover { background: #fffaf0; }
+.race-meta { display: flex; justify-content: space-between; text-transform: uppercase; letter-spacing: .12em; font-size: 13px; font-weight: 700; opacity: .72; }
+.eroi-race-card .race-card__number { color: #d95762; font-size: clamp(68px, 8vw, 112px); font-weight: 900; line-height: .7; margin-bottom: 28px; }
+.eroi-race-card--red .race-card__number { color: #f4efe5; }
+.eroi-race-card--light .race-card__number { color: #a91f2c; }
+.eroi-race-card h3 { font-family: 'Source Serif 4', serif; font-size: 38px; margin-bottom: 14px; }
+.eroi-race-card p:not(.race-card__number) { font-size: 18px; max-width: 520px; }
+.text-link { display: inline-flex; justify-content: space-between; gap: 30px; margin-top: 30px; padding-top: 16px; border-top: 1px solid currentColor; color: inherit; text-decoration: none; text-transform: uppercase; font-weight: 800; letter-spacing: .06em; }
+
+.eroi-manifesto { display: grid; grid-template-columns: .8fr 1.2fr; align-items: center; gap: 8vw; background: #a91f2c; color: #fff; }
+.eroi-manifesto .section-kicker { color: #efb4b5; }
+.eroi-manifesto h2 { font-size: clamp(42px, 5vw, 72px); margin-top: 12px; }
+.manifesto-mark { font-size: clamp(86px, 14vw, 210px); font-weight: 900; line-height: .7; writing-mode: vertical-rl; transform: rotate(180deg); color: transparent; -webkit-text-stroke: 2px rgba(255,255,255,.32); }
+.eroi-manifesto .btn-2 { background: #f4efe5; color: #181815; border-color: #f4efe5; }
+
+.weekend-section { background: #ebe5da; }
+.weekend-section h2 { font-size: clamp(42px, 5vw, 68px); }
+.weekend-section .card { box-shadow: none; border-top: 4px solid #a91f2c; }
+.weekend-section .card-index { color: #a91f2c; }
+.weekend-section .program-card h3 { font-family: 'Source Serif 4', serif; font-size: 32px; }
+
+.community-band { display: grid; grid-template-columns: 1fr 1fr auto; gap: 60px; align-items: center; background: #20201c; color: #fff; }
+.community-band h2 { font-size: clamp(48px, 6vw, 82px); line-height: .86; margin-top: 8px; }
+.community-band .btn { white-space: nowrap; }
+.eroi-theme .quick-links a { background: #a91f2c; }
+.eroi-theme .quick-links a:hover { background: #7f1420; color: #fff; }
+.eroi-theme footer img { width: 96px; }
+
+@media (max-width: 768px) {
+  .eroi-hero { background-image: linear-gradient(180deg, rgba(14,14,13,.4), rgba(14,14,13,.94)), url('/images/trail-eroi/hero-monte-grappa.png'); background-position: 62% center; }
+  .eroi-hero__content { min-height: 78vh; padding-top: 100px; }
+  .eroi-hero .hero-title { font-size: clamp(50px, 15vw, 70px); }
+  .eroi-hero .hero-copy { font-size: 18px; }
+  .eroi-poster-card { min-height: 440px; }
+  .race-grid { grid-template-columns: 1fr; }
+  .eroi-race-card { min-height: 390px; padding: 26px; }
+  .eroi-race-card h3 { font-size: 31px; }
+  .eroi-manifesto { grid-template-columns: 1fr; }
+  .manifesto-mark { writing-mode: initial; transform: none; font-size: 28vw; line-height: .7; }
+  .community-band { grid-template-columns: 1fr; gap: 26px; }
+  .community-band .btn { width: 100%; }
+}
+
+@media (max-width: 768px) {
+  .eroi-theme .eroi-hero {
+    background-image: linear-gradient(180deg, rgba(14,14,13,.38), rgba(14,14,13,.94)), url('/images/trail-eroi/hero-monte-grappa.png');
+    background-position: 62% center;
+  }
 }
 
 .faq-question:focus-visible {
@@ -781,8 +958,8 @@ section {
   }
 
   .home-hero {
-    background: linear-gradient(rgba(25, 29, 47, 0.22), rgba(25, 29, 47, 0.78)),
-      url(images/francigena/hero-1-mobile.jpg);
+    background: linear-gradient(rgba(5, 15, 8, 0.54), rgba(5, 15, 8, 0.9)),
+      url('https://static.wixstatic.com/media/7f418a_af22e500d2214084bc087d3ab8a8f556~mv2.jpg/v1/fill/w_800,h_1100,al_c,q_85,enc_avif,quality_auto/7f418a_af22e500d2214084bc087d3ab8a8f556~mv2.jpg');
     background-position: center top;
   }
 
@@ -800,6 +977,23 @@ section {
   .hero-title {
     font-size: 42px;
   }
+
+  .maunik-hero__content { min-height: 74vh; }
+  .maunik-hero .hero-title { font-size: 56px; }
+  .maunik-hero .hero-copy { font-size: 18px; }
+  .race-strip { grid-template-columns: 1fr 1fr; padding: 18px 4%; }
+  .race-strip > div { padding: 14px; border-left: 0; border-bottom: 1px solid rgba(18,22,17,.2); }
+  .race-strip strong { font-size: 20px; }
+  .section-heading { display: block; }
+  .section-heading > p { margin-top: 20px; }
+  .maunik-poster-card { min-height: 410px; }
+  .poster-visual strong { font-size: 54px; }
+  .race-card { min-height: 480px; padding: 26px; }
+  .race-card__number { font-size: 54px; }
+  .race-card__body h3 { font-size: 34px; }
+  .maunik-manifesto { padding-right: 6%; }
+  .maunik-manifesto h2 { font-size: 32px; }
+  .quick-links { grid-template-columns: 1fr; }
 
   .countdown {
     gap: 10px;
@@ -894,5 +1088,13 @@ section {
 
   .cookie-option {
     align-items: flex-start;
+  }
+}
+
+/* Keep the event artwork on small screens after legacy responsive rules. */
+@media (max-width: 768px) {
+  .eroi-theme .eroi-hero {
+    background-image: linear-gradient(180deg, rgba(14,14,13,.38), rgba(14,14,13,.94)), url('/images/trail-eroi/hero-monte-grappa.png');
+    background-position: 62% center;
   }
 }

@@ -1,7 +1,7 @@
 :root {
-    --primary: #c64735;
-    --primary-hover: #9e3027;
-    --primary-soft: #d8ad4a;
+    --primary: #a91f2c;
+    --primary-hover: #7f1420;
+    --primary-soft: #e8c4bf;
 
     --bg-main: #f6f0e4;
     --bg-secondary: #dfe8dc;
@@ -9,7 +9,7 @@
     --bg-alt: #d8ad4a;
 
     --text-main: #191d2f;
-    --text-secondary: #25386a;
+    --text-secondary: #20201c;
     --text-muted: #626569;
     --text-disabled: #8C8C8C;
     --text-white: #FFFFFF;
@@ -68,6 +68,21 @@
     font-size: 20px;
 }
 
+.logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.logo img { width: 42px; height: 42px; object-fit: contain; }
+.logo-wordmark { font-size: 17px; font-weight: 500; letter-spacing: .11em; }
+.logo-wordmark strong { font-weight: 900; }
+.nav-cta { position: absolute; right: 22px; padding: 10px 20px; background: var(--primary); color: #fff; text-decoration: none; text-transform: uppercase; font-weight: 800; }
+
 /* Menù laterale */
 .side-menu {
     height: 100%;
@@ -83,6 +98,11 @@
 
     transition: 0.3s;
     padding-top: 60px;
+}
+
+@media (max-width: 560px) {
+    .logo span { display: none; }
+    .nav-cta { right: 14px; padding: 9px 13px; font-size: 13px; }
 }
 
 .side-menu a {

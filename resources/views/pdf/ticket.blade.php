@@ -27,7 +27,7 @@
             <p><strong>Navetta:</strong> {{ $ticket->shuttle_needed }}</p>
             <p class="small-p">Legenda per i campi "Celiachia" e "Navetta":<br>0 = NO<br>1 = SÌ</p>
             <p><strong>Importo pagato:</strong> {{ $ticket->price_paid }}€</p>
-            <p class="small-p">Il biglietto funge da ricevuta di pagamento elettronico dell’importo sopra indicato. Nel caso si necessiti di fattura fiscale nominativa, preghiamo di contattare via mail l’indirizzo info@francigenaultramarathon.com inserendo nell’oggetto il codice biglietto e il tipo di richiesta.</p>
+            <p class="small-p">Il biglietto funge da ricevuta di pagamento elettronico dell’importo sopra indicato. Nel caso si necessiti di fattura fiscale nominativa, preghiamo di contattare via mail l’indirizzo info@traildeglieroi.it inserendo nell’oggetto il codice biglietto e il tipo di richiesta.</p>
         </div>
         <div class="ticket-code">
             <p>CODICE BIGLIETTO</p>

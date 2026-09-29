@@ -254,7 +254,7 @@ class AdminController extends Controller
                 'email' => trim($row[2]) ?: 'no-email@test.com',
                 
                 // Scelte Maratona
-                'route_choice' => trim($row[3]) ?: 'Tratte brevi',
+                'route_choice' => trim($row[3]) ?: 'Trail degli Eroi 46K',
                 'tshirt_size' => trim($row[9]) ?: 'L',
                 
                 // Dati di Nascita e Documenti
@@ -329,7 +329,7 @@ class AdminController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'route_choice' => 'required|in:Grande Sfida 130 km,Tratte intermedie,Tratte brevi',
+            'route_choice' => 'required|in:Trail degli Eroi 46K,Sky degli Eroi 27K,Downhill degli Eroi 12K,Santa Felicita 14K',
             'dob' => 'required|date',
             'birth_place' => 'required|string|max:255',
             'residence_address' => 'required|string|max:255',

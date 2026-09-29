@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagamento - Francigena Ultra Marathon</title>
+    <title>Pagamento - Trail degli Eroi</title>
     <link rel="stylesheet" href="{{ asset('css/style.css?v=1.8') }}">
     <script src="https://js.stripe.com/v3/"></script>
 </head>

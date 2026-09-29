@@ -4,13 +4,13 @@
     <main>
         <section>
             <h1>Partner</h1>
-            <p class="top-margin-large">Questa pagina è pronta per ospitare sponsor, associazioni, istituzioni e collaborazioni dell’edizione Walking Francigena Ultra Marathon 2026.</p>
+            <p class="top-margin-large">I supporter, le istituzioni e le realtà locali che rendono possibile il Trail degli Eroi 2026.</p>
         </section>
 
         <section class="grid-3">
             <div class="card">
                 <h2>Istituzioni</h2>
-                <p class="top-margin-large">Spazio per enti patrocinanti e amministrazioni lungo il percorso da Siena ad Acquapendente.</p>
+                <p class="top-margin-large">Le istituzioni e le realtà che custodiscono il territorio del Monte Grappa.</p>
             </div>
             <div class="card">
                 <h2>Sponsor</h2>
@@ -18,7 +18,7 @@
             </div>
             <div class="card">
                 <h2>Collaborazioni</h2>
-                <p class="top-margin-large">Spazio per associazioni, volontari, presidi territoriali e progetti culturali della Via Francigena.</p>
+                <p class="top-margin-large">Associazioni, volontari e presidi territoriali al fianco degli atleti lungo il percorso.</p>
             </div>
         </section>
     </main>

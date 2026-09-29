@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iscrizione Francigena Ultra Marathon</title>
+    <title>Iscrizione Trail degli Eroi 2026</title>
     <link rel="stylesheet" href="{{ asset('css/style.css?v=1.8') }}">
 </head>
 <body class="center-items checkout-body">
 
     <div class="checkout-wrapper stack-large">
-        <h1 class="center-text">Iscrizione Francigena Ultra Marathon</h1>
+        <div class="center-items"><a href="/"><img src="/images/trail-eroi/logo-mark.svg" alt="Trail degli Eroi" style="width:84px;height:auto"></a></div>
+        <h1 class="center-text">Iscrizione Trail degli Eroi</h1>
+        <p class="center-text">Scegli la tua sfida sul Monte Grappa.</p>
 
         <form action="{{ route('checkout.store') }}" method="POST" id="marathon-form">
             @if($errors->any())
@@ -53,10 +55,11 @@
                         <div class="label-box">
                             <label>Scelta del percorso</label>
                             <select name="tickets[0][route_choice]" required>
-                                <option value="">Scelta tratta</option>
-                                <option value="Grande Sfida 130 km" {{ request('percorso') == 'Grande Sfida 130 km' ? 'selected' : '' }}>Grande Sfida - 130 km</option>
-                                <option value="Tratte intermedie" {{ request('percorso') == 'Tratte intermedie' ? 'selected' : '' }}>Tratte intermedie</option>
-                                <option value="Tratte brevi" {{ request('percorso') == 'Tratte brevi' ? 'selected' : '' }}>Tratte brevi</option>
+                                <option value="">Scegli la gara</option>
+                                <option value="Trail degli Eroi 46K" {{ request('percorso') == 'Trail degli Eroi 46K' ? 'selected' : '' }}>Trail degli Eroi — 46 km / 2.500 D+</option>
+                                <option value="Sky degli Eroi 27K" {{ request('percorso') == 'Sky degli Eroi 27K' ? 'selected' : '' }}>Sky degli Eroi — 27 km / 1.700 D+</option>
+                                <option value="Downhill degli Eroi 12K" {{ request('percorso') == 'Downhill degli Eroi 12K' ? 'selected' : '' }}>Downhill degli Eroi — 12 km / 1.500 D-</option>
+                                <option value="Santa Felicita 14K" {{ request('percorso') == 'Santa Felicita 14K' ? 'selected' : '' }}>Santa Felicita — 14 km / 800 D+</option>
                             </select>
                         </div>
 
@@ -216,13 +219,13 @@
             const regionSelect = block.querySelector('.region-select');
             regionSelect.innerHTML = '<option value="">Seleziona Regione</option>';
             Object.keys(italyLocations).sort().forEach(region => {
-                const isSelected = region === 'Toscana' ? 'selected' : '';
+                const isSelected = region === 'Veneto' ? 'selected' : '';
                 regionSelect.innerHTML += `<option value="${region}" ${isSelected}>${region}</option>`;
             });
             updateProvinces(regionSelect, true);
         }
 
-        function updateProvinces(regionSelect, setSienaDefault = false) {
+        function updateProvinces(regionSelect, setVicenzaDefault = false) {
             const block = regionSelect.closest('.ticket-block');
             const provinceSelect = block.querySelector('.province-select');
             const region = regionSelect.value;
@@ -230,7 +233,7 @@
             provinceSelect.innerHTML = '<option value="">Seleziona Provincia</option>';
             if (italyLocations[region]) {
                 italyLocations[region].sort().forEach(prov => {
-                    const isSelected = (setSienaDefault && prov === 'Siena') ? 'selected' : '';
+                    const isSelected = (setVicenzaDefault && prov === 'Vicenza') ? 'selected' : '';
                     provinceSelect.innerHTML += `<option value="${prov}" ${isSelected}>${prov}</option>`;
                 });
             }

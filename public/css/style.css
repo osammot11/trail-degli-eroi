@@ -1,22 +1,22 @@
 @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@200;300;400;500;600;700;800;900&display=swap");
 
 :root {
-    --primary: #c64735;
-    --primary-hover: #9e3027;
-    --primary-soft: #d8ad4a;
+    --primary: #a91f2c;
+    --primary-hover: #7f1420;
+    --primary-soft: #e8c4bf;
 
-    --bg-main: #f6f0e4;
-    --bg-secondary: #dfe8dc;
+    --bg-main: #f4efe5;
+    --bg-secondary: #ded7ca;
     --bg-card: #ffffff;
-    --bg-alt: #d8ad4a;
+    --bg-alt: #a91f2c;
 
-    --text-main: #191d2f;
-    --text-secondary: #25386a;
+    --text-main: #181815;
+    --text-secondary: #20201c;
     --text-muted: #626569;
     --text-disabled: #8c8c8c;
     --text-white: #ffffff;
 
-    --border-light: #ded4c2;
+    --border-light: #cfd8c9;
     --border-grey: #dddddd;
     --radius-small: 6px;
     --radius-big: 12px;

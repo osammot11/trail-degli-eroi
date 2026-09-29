@@ -3,20 +3,20 @@
         <div class="center-items">
             <img
                 style="max-width: 200px"
-                alt="Walking Francigena Ultra Marathon"
-                src="/images/francigena/logo-francigena.jpg"
+                alt="Trail degli Eroi"
+                src="/images/trail-eroi/logo-mark.svg"
                 loading="lazy"
                 decoding="async"
             >
         </div>
 
         <p class="center-text top-margin">
-            Demo sito Walking Francigena Ultra Marathon 2026.
+            Dove la corsa incontra la storia.
         </p>
 
         <div class="grid-3 top-margin">
             <div class="center-text center-items footer">
-                <a href="/#percorsi">Tratte</a>
+                <a href="/#gare">Le gare</a>
                 <a href="/#programma">Programma</a>
                 <a href="/iscrizione">Iscrizioni</a>
             </div>
@@ -33,10 +33,10 @@
             </div>
         </div>
 
-        <p class="center-text top-margin">Siena - Acquapendente · <a class="hyperlink" href="mailto:info@francigenaultramarathon.com">info@francigenaultramarathon.com</a></p>
+        <p class="center-text top-margin">Romano d'Ezzelino · Monte Grappa · <a class="hyperlink" href="mailto:info@traildeglieroi.it">info@traildeglieroi.it</a></p>
 
         <p class="center-text top-margin-xl">
-            © 2026 Walking Francigena Ultra Marathon. Tutti i diritti riservati.
+            © 2011–2026 Trail degli Eroi · I Lupi Team – Adventure Run.
         </p>
         <div class="fullwidth center-items">
             <a href="https://tommasogiovannoni.com" class="center-text top-margin-xl hyperlink">Sviluppato da tommasogiovannoni.com</a>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crea Biglietto Manuale - Francigena Ultra Marathon</title>
+    <title>Crea Biglietto Manuale - Trail degli Eroi</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-6">
@@ -60,9 +60,10 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                     <select name="route_choice" required class="border p-2 rounded">
                         <option value="">-- Scelta Tratta --</option>
-                        <option value="Grande Sfida 130 km" {{ old('route_choice') == 'Grande Sfida 130 km' ? 'selected' : '' }}>Grande Sfida - 130 km</option>
-                        <option value="Tratte intermedie" {{ old('route_choice') == 'Tratte intermedie' ? 'selected' : '' }}>Tratte intermedie</option>
-                        <option value="Tratte brevi" {{ old('route_choice') == 'Tratte brevi' ? 'selected' : '' }}>Tratte brevi</option>
+                        <option value="Trail degli Eroi 46K" {{ old('route_choice') == 'Trail degli Eroi 46K' ? 'selected' : '' }}>Trail degli Eroi — 46 km / 2.500 D+</option>
+                        <option value="Sky degli Eroi 27K" {{ old('route_choice') == 'Sky degli Eroi 27K' ? 'selected' : '' }}>Sky degli Eroi — 27 km / 1.700 D+</option>
+                        <option value="Downhill degli Eroi 12K" {{ old('route_choice') == 'Downhill degli Eroi 12K' ? 'selected' : '' }}>Downhill degli Eroi — 12 km / 1.500 D-</option>
+                        <option value="Santa Felicita 14K" {{ old('route_choice') == 'Santa Felicita 14K' ? 'selected' : '' }}>Santa Felicita — 14 km / 800 D+</option>
                     </select>
 
                     <select name="tshirt_size" required class="border p-2 rounded">

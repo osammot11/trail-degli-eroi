@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conferma Iscrizione - Francigena Ultra Marathon</title>
+    <title>Conferma iscrizione - Trail degli Eroi</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-6 md:p-12">
@@ -11,7 +11,7 @@
     <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
         <div class="bg-green-600 p-6 text-white text-center">
             <h1 class="text-3xl font-bold">Iscrizione Completata!</h1>
-            <p class="mt-2 opacity-90">Grazie per la tua partecipazione alla Francigena Ultra Marathon.</p>
+            <p class="mt-2 opacity-90">Grazie per la tua partecipazione al Trail degli Eroi.</p>
         </div>
 
         <div class="p-8">

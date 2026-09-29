@@ -24,7 +24,7 @@ class CheckoutController extends Controller
             // ... [qui lascia tutta la validazione dei tickets.* che avevamo prima] ...
             'tickets.*.first_name' => 'required|string|max:255',
             'tickets.*.last_name' => 'required|string|max:255',
-            'tickets.*.route_choice' => 'required|in:Grande Sfida 130 km,Tratte intermedie,Tratte brevi',
+            'tickets.*.route_choice' => 'required|in:Trail degli Eroi 46K,Sky degli Eroi 27K,Downhill degli Eroi 12K,Santa Felicita 14K',
             'tickets.*.dob' => 'required|date',
             'tickets.*.birth_place' => 'required|string|max:255',
             'tickets.*.residence_address' => 'required|string|max:255',
@@ -105,7 +105,7 @@ class CheckoutController extends Controller
                 'price_data' => [
                     'currency' => 'eur',
                     'product_data' => [
-                        'name' => 'Iscrizione Francigena Ultra Marathon - ' . $ticket->first_name . ' ' . $ticket->last_name,
+                        'name' => 'Iscrizione Trail degli Eroi - ' . $ticket->first_name . ' ' . $ticket->last_name,
                         'description' => 'Taglia maglia: ' . $ticket->tshirt_size,
                     ],
                     // ECCO LA MAGIA: Moltiplichiamo il prezzo pagato per 100 (Stripe vuole i centesimi)
@@ -207,7 +207,7 @@ class CheckoutController extends Controller
         $pdf = Pdf::loadView('pdf.ticket', compact('ticket'));
         
         // Nome file pulito: Biglietto_Nome_Cognome.pdf
-        $fileName = 'Biglietto_Francigena_' . str_replace(' ', '_', $ticket->last_name) . '.pdf';
+        $fileName = 'Biglietto_Trail_degli_Eroi_' . str_replace(' ', '_', $ticket->last_name) . '.pdf';
         
         return $pdf->download($fileName);
     }

@@ -30,7 +30,7 @@ class SendTicketEmail implements ShouldQueue
 
         $htmlContent = "
             <h2>Ciao {$this->ticket->first_name}, iscrizione confermata!</h2>
-            <p>La tua partecipazione alla Walking Francigena Ultra Marathon è ufficiale.</p>
+            <p>La tua partecipazione al Trail degli Eroi è ufficiale.</p>
             <p>Puoi accedere alla tua area riservata per scaricare il tuo biglietto nominale in PDF in qualsiasi momento:</p>
             <p><a href='{$thankYouLink}' style='padding: 10px 20px; background-color: #c64735; color: white; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 10px;'>Scarica il tuo Biglietto</a></p>
             <p>A presto!</p>
@@ -62,7 +62,7 @@ class SendTicketEmail implements ShouldQueue
                         $this->ticket->last_name,
                 ],
             ],
-            "subject" => "Iscrizione Confermata - Francigena Ultra Marathon",
+            "subject" => "Iscrizione confermata - Trail degli Eroi",
             "htmlContent" => $htmlContent,
         ]);
 

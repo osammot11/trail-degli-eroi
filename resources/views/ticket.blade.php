@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Biglietto Francigena Ultra Marathon</title>
+    <title>Biglietto Trail degli Eroi</title>
     <style>
         body { font-family: 'Helvetica', 'Arial', sans-serif; color: #333; }
         .ticket-container { border: 2px dashed #000; padding: 20px; margin: 20px auto; max-width: 600px; text-align: center; }
@@ -16,7 +16,7 @@
 
     <div class="ticket-container">
         <div class="header">
-            Francigena Ultra Marathon
+            Trail degli Eroi
         </div>
         
         <div class="details">
