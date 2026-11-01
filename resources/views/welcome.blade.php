@@ -357,14 +357,15 @@
 
         function updateTotal() {
             const basePrice = {{ $currentPrice }};
-            const finalPricePerTicket = basePrice;
 
             const ticketBlocks = document.querySelectorAll('.ticket-block');
             const count = ticketBlocks.length;
+            const total = Array.from(ticketBlocks).reduce((sum, block, index) => {
+                if ((index + 1) % 11 === 0) return sum;
 
-            const freeTickets = Math.floor(count / 11);
-            const paidTickets = count - freeTickets;
-            const total = paidTickets * finalPricePerTicket;
+                const route = block.querySelector('.route-choice-select').value;
+                return sum + Number(liveRaceAvailability[route]?.price ?? basePrice);
+            }, 0);
 
             const btn = document.getElementById('payment-button');
             const paymentMethodBox = document.getElementById('payment-method-box');
@@ -394,7 +395,7 @@
 
             paymentMethodBox.hidden = false;
             paymentMethod.required = true;
-            btn.innerText = `Procedi al Pagamento - ${total}€`;
+            btn.innerText = `Procedi al Pagamento - ${total.toFixed(2).replace('.', ',')}€`;
         }
 
         let participantCount = 1;

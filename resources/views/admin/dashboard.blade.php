@@ -124,6 +124,18 @@
                                     class="border p-2 rounded w-full"
                                     required
                                 >
+                                <label class="block text-xs text-gray-500 mb-1 mt-3" for="{{ $race['price_key'] }}">Prezzo della distanza (€)</label>
+                                <input
+                                    id="{{ $race['price_key'] }}"
+                                    type="number"
+                                    min="0"
+                                    max="10000"
+                                    step="0.01"
+                                    name="{{ $race['price_key'] }}"
+                                    value="{{ old($race['price_key'], $race['price']) }}"
+                                    class="border p-2 rounded w-full"
+                                    required
+                                >
                             </div>
                         @endforeach
                     </div>

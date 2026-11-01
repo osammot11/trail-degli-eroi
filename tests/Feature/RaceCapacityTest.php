@@ -54,10 +54,12 @@ class RaceCapacityTest extends TestCase
     public function test_public_availability_endpoint_exposes_remaining_places(): void
     {
         Setting::where('key', 'race_capacity_sky_27k')->update(['value' => '25']);
+        Setting::where('key', 'race_price_sky_27k')->update(['value' => '35.50']);
 
         $this->getJson('/api/race-availability')
             ->assertOk()
             ->assertJsonPath('races.Sky degli Eroi 27K.capacity', 25)
+            ->assertJsonPath('races.Sky degli Eroi 27K.price', 35.5)
             ->assertJsonPath('races.Sky degli Eroi 27K.remaining', 25)
             ->assertJsonPath('races.Sky degli Eroi 27K.is_sold_out', false);
     }

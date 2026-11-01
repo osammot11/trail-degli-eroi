@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use Illuminate\Support\Str;
 use App\Jobs\SendTicketEmail;
+use App\Jobs\SendRaceChangeEmail;
+use App\Models\TicketChange;
 use Illuminate\Support\Facades\File;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\RaceCapacityService;
@@ -155,18 +157,76 @@ class AdminController extends Controller
     }
     
     // --- 3. Modifica Utente ---
-    public function editTicket($id)
+    public function editTicket($id, RaceCapacityService $raceCapacity)
     {
-        $ticket = \App\Models\Ticket::findOrFail($id);
-        return view('admin.edit_ticket', compact('ticket'));
+        $ticket = Ticket::with(['changes.changedBy'])->findOrFail($id);
+        $raceAvailability = $raceCapacity->availability();
+
+        return view('admin.edit_ticket', compact('ticket', 'raceAvailability'));
     }
 
-    public function updateTicketData(Request $request, $id)
+    public function updateTicketData(Request $request, $id, RaceCapacityService $raceCapacity)
     {
-        $ticket = \App\Models\Ticket::findOrFail($id);
-        
-        // Aggiorniamo i dati modificabili (puoi aggiungere regole di validazione se vuoi)
-        $ticket->update($request->all());
+        $ticket = Ticket::findOrFail($id);
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'phone' => ['required', 'string', 'max:20'],
+            'codice_fiscale' => ['nullable', 'string', 'max:16'],
+            'tshirt_size' => ['required', Rule::in(['XS', 'S', 'M', 'L', 'XL', 'XXL'])],
+            'residence_address' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'zip_code' => ['required', 'string', 'max:20'],
+            'tag_1' => ['nullable', 'string', 'max:255'],
+            'tag_2' => ['nullable', 'string', 'max:255'],
+            'route_choice' => ['required', Rule::in($raceCapacity->routeValues())],
+        ]);
+
+        $oldRoute = $ticket->route_choice;
+        $paidAmount = (float) $ticket->price_paid;
+        $routeChanged = $oldRoute !== $validated['route_choice'];
+        $change = null;
+
+        DB::transaction(function () use ($ticket, $validated, $routeChanged, $oldRoute, $paidAmount, $raceCapacity, &$change) {
+            if ($routeChanged) {
+                $raceCapacity->assertCanReserve([$validated['route_choice']]);
+            }
+
+            $ticket->update($validated);
+
+            if ($routeChanged) {
+                $newRoutePrice = $raceCapacity->priceForRoute($validated['route_choice']);
+                $difference = round($newRoutePrice - $paidAmount, 2);
+
+                $change = TicketChange::create([
+                    'ticket_id' => $ticket->id,
+                    'changed_by' => auth()->id(),
+                    'type' => 'route_change',
+                    'from_value' => $oldRoute,
+                    'to_value' => $validated['route_choice'],
+                    'amount_difference' => $difference,
+                    'metadata' => [
+                        'price_paid' => $paidAmount,
+                        'new_route_price' => $newRoutePrice,
+                    ],
+                ]);
+            }
+        });
+
+        if ($change) {
+            SendRaceChangeEmail::dispatch($change);
+
+            $difference = (float) $change->amount_difference;
+            $differenceMessage = match (true) {
+                $difference > 0 => ' Differenza da incassare: € '.number_format($difference, 2, ',', '.').'.',
+                $difference < 0 => ' Importo a favore dell’atleta: € '.number_format(abs($difference), 2, ',', '.').'.',
+                default => ' Nessuna differenza di prezzo.',
+            };
+
+            return redirect()->route('admin.edit_ticket', $ticket->id)
+                ->with('success', 'Distanza aggiornata e notifica programmata.'.$differenceMessage);
+        }
 
         return redirect()->route('admin.dashboard')->with('success', 'Dati di ' . $ticket->first_name . ' aggiornati con successo!');
     }
@@ -201,6 +261,7 @@ class AdminController extends Controller
 
         foreach (RaceCapacityService::RACES as $race) {
             $rules[$race['capacity_key']] = ['required', 'integer', 'min:0', 'max:100000'];
+            $rules[$race['price_key']] = ['required', 'numeric', 'min:0', 'max:10000'];
         }
 
         $validated = $request->validate($rules);

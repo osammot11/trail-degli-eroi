@@ -16,4 +16,9 @@ class Ticket extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
+    public function changes()
+    {
+        return $this->hasMany(TicketChange::class)->latest();
+    }
 }

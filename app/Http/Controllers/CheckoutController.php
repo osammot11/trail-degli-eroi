@@ -62,16 +62,17 @@ class CheckoutController extends Controller
         $discountAmount = 0;
         $appliedDiscountLabel = null;
 
-        // Prezzo standard per i biglietti paganti
-        $finalPricePerTicket = max(0, $basePrice - $discountAmount);
-
         // --- LOGICA PROMO GRUPPI (Ogni 11 biglietti, 1 è gratis) ---
         $totalTickets = count($validatedData['tickets']);
         $freeTicketsCount = floor($totalTickets / 11);
-        $paidTicketsCount = $totalTickets - $freeTicketsCount;
+        $raceAvailability = $raceCapacity->availability();
+        $ticketPrices = collect($validatedData['tickets'])
+            ->map(fn (array $ticket) => max(0, (float) ($raceAvailability[$ticket['route_choice']]['price'] ?? $basePrice) - $discountAmount))
+            ->all();
 
-        // Il totale dell'ordine si calcola ESCLUSIVAMENTE sui biglietti paganti
-        $totalAmount = $paidTicketsCount * $finalPricePerTicket;
+        $totalAmount = collect($ticketPrices)
+            ->reject(fn (float $price, int $index) => (($index + 1) % 11) === 0)
+            ->sum();
 
         if (! $requestWaitlist && $validatedData['payment_method'] === 'stripe' && (blank(config('services.stripe.secret')) || blank(config('services.stripe.key')))) {
             return back()
@@ -87,7 +88,7 @@ class CheckoutController extends Controller
 
         // 3. Creazione Ordine e Biglietti
         $isWaitlist = false;
-        $order = DB::transaction(function () use ($request, $validatedData, $appliedDiscountLabel, $totalAmount, $finalPricePerTicket, $raceCapacity, $routeChoices, $distinctRoutes, $requestWaitlist, &$isWaitlist) {
+        $order = DB::transaction(function () use ($request, $validatedData, $appliedDiscountLabel, $totalAmount, $ticketPrices, $raceCapacity, $routeChoices, $distinctRoutes, $requestWaitlist, &$isWaitlist) {
             $isWaitlist = $requestWaitlist || ! $raceCapacity->canReserve($routeChoices, lock: true);
 
             if ($isWaitlist && count($distinctRoutes) > 1) {
@@ -109,7 +110,7 @@ class CheckoutController extends Controller
             foreach ($validatedData['tickets'] as $index => $data) {
                 // L'undicesimo biglietto (indice 10, 21, 32...) ha prezzo 0€
                 $isFreeTicket = (($index + 1) % 11 == 0);
-                $ticketPrice = $isFreeTicket ? 0 : $finalPricePerTicket;
+                $ticketPrice = $isFreeTicket ? 0 : $ticketPrices[$index];
 
                 $order->tickets()->create(array_merge($data, [
                     'unique_ticket_code' => null,
