@@ -14,6 +14,7 @@ Route::get('/checkout/{order_code}/payment', [CheckoutController::class, 'paymen
 
 // Rotta per il ritorno DOPO il pagamento confermato (GET)
 Route::get('/checkout/success/{order_code}', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::get('/lista-attesa/conferma/{order_code}', [CheckoutController::class, 'waitlistConfirmation'])->name('waitlist.confirmation');
 
 // Rotta per il ritorno in caso di ANNULLAMENTO (GET)
 Route::get('/checkout/cancel/{order}', [CheckoutController::class, 'cancel'])->name('checkout.cancel');

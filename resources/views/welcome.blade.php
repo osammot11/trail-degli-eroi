@@ -22,7 +22,7 @@
                         @if($race['is_unlimited'])
                             Iscrizioni aperte
                         @elseif($race['is_sold_out'])
-                            Sold out
+                            Lista d’attesa aperta
                         @else
                             {{ $race['remaining'] }} posti disponibili
                         @endif
@@ -79,9 +79,8 @@
                                         value="{{ $race['route'] }}"
                                         data-base-label="{{ $race['label'] }} — {{ $race['distance'] }}"
                                         {{ request('percorso') == $race['route'] ? 'selected' : '' }}
-                                        {{ $race['is_sold_out'] && request('percorso') != $race['route'] ? 'disabled' : '' }}
                                     >
-                                        {{ $race['label'] }} — {{ $race['distance'] }}{{ $race['is_sold_out'] ? ' — SOLD OUT' : ($race['is_unlimited'] ? '' : ' — '.$race['remaining'].' posti') }}
+                                        {{ $race['label'] }} — {{ $race['distance'] }}{{ $race['is_sold_out'] ? ' — ENTRA IN LISTA' : ($race['is_unlimited'] ? '' : ' — '.$race['remaining'].' posti') }}
                                     </option>
                                 @endforeach
                             </select>
@@ -193,7 +192,7 @@
             <input type="hidden" name="is_mutua_member" value="0">
 
             <div class="stack-mid">
-              <div class="label-box top-margin-xl">
+              <div class="label-box top-margin-xl" id="payment-method-box">
                   <label>Metodo di Pagamento</label>
                   <select name="payment_method">
                       <option value="stripe">Carta</option>
@@ -202,7 +201,7 @@
               </div>
             
               <label>
-                  <input type="checkbox" value="1" checked required>Procedendo al pagamento dichiaro di accettare la <a href="/privacy-policy">privacy policy</a> e il <a href="/regolamento">regolamento</a> dell'evento
+                  <input type="checkbox" value="1" checked required>Procedendo con la richiesta dichiaro di accettare la <a href="/privacy-policy">privacy policy</a> e il <a href="/regolamento">regolamento</a> dell'evento
               </label>
 
               <label>
@@ -220,7 +219,7 @@
 
         function availabilityLabel(race) {
             if (race.is_unlimited) return 'Iscrizioni aperte';
-            if (race.is_sold_out) return 'Sold out';
+            if (race.is_sold_out) return 'Lista d’attesa aperta';
             return `${race.remaining} posti disponibili`;
         }
 
@@ -242,10 +241,12 @@
                     const race = races[option.value];
                     const baseLabel = option.dataset.baseLabel || option.textContent.split(' — SOLD OUT')[0];
                     option.dataset.baseLabel = baseLabel;
-                    option.textContent = `${baseLabel}${race.is_sold_out ? ' — SOLD OUT' : (race.is_unlimited ? '' : ` — ${race.remaining} posti`)}`;
-                    option.disabled = race.is_sold_out && select.value !== option.value;
+                    option.textContent = `${baseLabel}${race.is_sold_out ? ' — ENTRA IN LISTA' : (race.is_unlimited ? '' : ` — ${race.remaining} posti`)}`;
+                    option.disabled = false;
                 });
             });
+
+            updateTotal();
         }
 
         async function refreshAvailability() {
@@ -366,6 +367,33 @@
             const total = paidTickets * finalPricePerTicket;
 
             const btn = document.getElementById('payment-button');
+            const paymentMethodBox = document.getElementById('payment-method-box');
+            const paymentMethod = paymentMethodBox.querySelector('select');
+            const selectedRoutes = Array.from(document.querySelectorAll('.route-choice-select'))
+                .map(select => select.value)
+                .filter(route => route && liveRaceAvailability[route]);
+            const hasWaitlist = selectedRoutes.some(route => liveRaceAvailability[route].is_sold_out);
+            const hasRegistration = selectedRoutes.some(route => !liveRaceAvailability[route].is_sold_out);
+
+            if (hasWaitlist && hasRegistration) {
+                btn.innerText = 'Separa iscrizioni e lista d’attesa';
+                btn.disabled = true;
+                paymentMethodBox.hidden = false;
+                paymentMethod.required = true;
+                return;
+            }
+
+            btn.disabled = false;
+
+            if (hasWaitlist && selectedRoutes.length === count) {
+                btn.innerText = 'Entra in lista d’attesa — Nessun pagamento';
+                paymentMethodBox.hidden = true;
+                paymentMethod.required = false;
+                return;
+            }
+
+            paymentMethodBox.hidden = false;
+            paymentMethod.required = true;
             btn.innerText = `Procedi al Pagamento - ${total}€`;
         }
 
@@ -429,6 +457,12 @@
             updateTotal();
             renderAvailability(liveRaceAvailability);
             window.setInterval(refreshAvailability, 30000);
+
+            document.getElementById('tickets-container').addEventListener('change', function(event) {
+                if (event.target.classList.contains('route-choice-select')) {
+                    updateTotal();
+                }
+            });
         });
     </script>
 </body>

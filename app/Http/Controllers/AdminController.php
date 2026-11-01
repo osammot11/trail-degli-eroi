@@ -44,8 +44,19 @@ class AdminController extends Controller
         $currentPrice = \App\Models\Setting::where('key', 'ticket_price')->value('value') ?? 26.00;
         $totalRevenue = $activeTickets->sum('price_paid');
         $raceAvailability = $raceCapacity->availability();
+        $waitlistTickets = Ticket::with('order')
+            ->where('status', 'waitlist')
+            ->orderBy('created_at')
+            ->orderBy('id')
+            ->get();
 
-        return view('admin.dashboard', compact('activeTickets', 'currentPrice', 'totalRevenue', 'raceAvailability'));
+        $waitlistCounters = [];
+        $waitlistTickets->each(function (Ticket $ticket) use (&$waitlistCounters) {
+            $waitlistCounters[$ticket->route_choice] = ($waitlistCounters[$ticket->route_choice] ?? 0) + 1;
+            $ticket->waitlist_position = $waitlistCounters[$ticket->route_choice];
+        });
+
+        return view('admin.dashboard', compact('activeTickets', 'currentPrice', 'totalRevenue', 'raceAvailability', 'waitlistTickets'));
     }
 
     // --- 2. Esportazione CSV (Il Super CSV Completo, Filtrato e TUTTO MAIUSCOLO) ---

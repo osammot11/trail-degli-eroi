@@ -522,6 +522,40 @@ section {
     text-transform: uppercase;
 }
 
+.waitlist-confirmation-list {
+    display: grid;
+    gap: 16px;
+    margin: 28px 0;
+}
+
+.waitlist-confirmation-card {
+    padding: 24px;
+    border: 1px solid #f0c36b;
+    border-radius: var(--radius-small);
+    background: #fffbeb;
+}
+
+.waitlist-confirmation-card span {
+    display: block;
+    color: #92400e;
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.waitlist-confirmation-card strong {
+    display: block;
+    margin: 8px 0;
+    color: #991b1b;
+    font-size: 42px;
+    line-height: 1;
+}
+
+.waitlist-confirmation-card h2,
+.waitlist-confirmation-card p {
+    margin: 4px 0;
+}
+
 .checkout-narrow {
     max-width: 760px;
     width: 100%;

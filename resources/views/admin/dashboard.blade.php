@@ -131,6 +131,48 @@
                 </form>
             </div>
 
+            <div class="bg-white p-6 rounded-lg shadow top-margin-large">
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b pb-4 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold">Lista d’attesa ({{ $waitlistTickets->count() }})</h2>
+                        <p class="text-sm text-gray-500 mt-1">Ordine cronologico separato per ogni distanza.</p>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-wide bg-amber-100 text-amber-800 px-3 py-2 rounded">Più vecchi per primi</span>
+                </div>
+
+                @if($waitlistTickets->isEmpty())
+                    <p class="text-sm text-gray-500">Nessun atleta in lista d’attesa.</p>
+                @else
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-600 text-sm border-b">
+                                    <th class="p-3">Posizione</th>
+                                    <th class="p-3">Atleta</th>
+                                    <th class="p-3">Distanza</th>
+                                    <th class="p-3">Ingresso in lista</th>
+                                    <th class="p-3">Contatti</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm">
+                                @foreach($waitlistTickets as $ticket)
+                                    <tr class="border-b hover:bg-amber-50">
+                                        <td class="p-3"><span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-amber-100 text-amber-800 font-bold">{{ $ticket->waitlist_position }}</span></td>
+                                        <td class="p-3 font-semibold">{{ $ticket->first_name }} {{ $ticket->last_name }}</td>
+                                        <td class="p-3">{{ $ticket->route_choice }}</td>
+                                        <td class="p-3">{{ $ticket->created_at->translatedFormat('d/m/Y H:i') }}</td>
+                                        <td class="p-3">
+                                            <div>{{ $ticket->email }}</div>
+                                            <div class="text-xs text-gray-500">{{ $ticket->phone }}</div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+
             <div class="col-span-3 top-margin-large">
                 <div class="bg-white p-6 rounded-lg shadow">
                     <h2 class="text-xl font-bold mb-4 border-b pb-2">Iscritti Trovati ({{ $activeTickets->count() }})</h2>

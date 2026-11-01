@@ -71,13 +71,8 @@ class RaceCapacityService
      */
     public function assertCanReserve(array $routeChoices): void
     {
-        Setting::query()
-            ->whereIn('key', $this->capacityKeys())
-            ->lockForUpdate()
-            ->get();
-
         $requested = array_count_values($routeChoices);
-        $availability = $this->availability();
+        $availability = $this->availabilityForReservation($routeChoices);
 
         foreach ($requested as $route => $quantity) {
             $race = $availability[$route] ?? null;
@@ -98,6 +93,23 @@ class RaceCapacityService
         }
     }
 
+    public function canReserve(array $routeChoices, bool $lock = false): bool
+    {
+        $availability = $lock
+            ? $this->availabilityForReservation($routeChoices)
+            : $this->availability();
+
+        foreach (array_count_values($routeChoices) as $route => $quantity) {
+            $race = $availability[$route] ?? null;
+
+            if (! $race || (! $race['is_unlimited'] && $quantity > $race['remaining'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function capacityKeys(): array
     {
         return array_column(self::RACES, 'capacity_key');
@@ -115,5 +127,20 @@ class RaceCapacityService
             ->pluck('aggregate', 'route_choice')
             ->map(fn ($count) => (int) $count)
             ->all();
+    }
+
+    private function availabilityForReservation(array $routeChoices): array
+    {
+        Setting::query()
+            ->whereIn('key', collect($routeChoices)
+                ->map(fn (string $route) => self::RACES[$route]['capacity_key'] ?? null)
+                ->filter()
+                ->unique()
+                ->values()
+                ->all())
+            ->lockForUpdate()
+            ->get();
+
+        return $this->availability();
     }
 }

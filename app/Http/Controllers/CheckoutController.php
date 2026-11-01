@@ -46,6 +46,16 @@ class CheckoutController extends Controller
             'tickets.*.celiac' => 'required|boolean',
         ]);
 
+        $routeChoices = array_column($validatedData['tickets'], 'route_choice');
+        $distinctRoutes = array_values(array_unique($routeChoices));
+        $requestWaitlist = ! $raceCapacity->canReserve($routeChoices);
+
+        if ($requestWaitlist && count($distinctRoutes) > 1) {
+            return back()
+                ->withInput()
+                ->withErrors(['tickets' => 'La richiesta contiene distanze disponibili e distanze in lista d’attesa. Invia due richieste separate.']);
+        }
+
         // 2. Calcolo del prezzo
         // Leggiamo il prezzo dal database. Se non dovesse esistere, usiamo 28.00 come paracadute.
         $basePrice = \App\Models\Setting::where('key', 'ticket_price')->value('value') ?? 28.00;
@@ -63,7 +73,7 @@ class CheckoutController extends Controller
         // Il totale dell'ordine si calcola ESCLUSIVAMENTE sui biglietti paganti
         $totalAmount = $paidTicketsCount * $finalPricePerTicket;
 
-        if ($validatedData['payment_method'] === 'stripe' && (blank(config('services.stripe.secret')) || blank(config('services.stripe.key')))) {
+        if (! $requestWaitlist && $validatedData['payment_method'] === 'stripe' && (blank(config('services.stripe.secret')) || blank(config('services.stripe.key')))) {
             return back()
                 ->withInput()
                 ->withErrors(['payment_method' => 'Stripe non è configurato: controlla STRIPE_SECRET e STRIPE_KEY nel file .env oppure la configurazione Laravel in cache.']);
@@ -76,17 +86,24 @@ class CheckoutController extends Controller
         }
 
         // 3. Creazione Ordine e Biglietti
-        $order = DB::transaction(function () use ($request, $validatedData, $appliedDiscountLabel, $totalAmount, $finalPricePerTicket, $raceCapacity) {
-            $raceCapacity->assertCanReserve(array_column($validatedData['tickets'], 'route_choice'));
+        $isWaitlist = false;
+        $order = DB::transaction(function () use ($request, $validatedData, $appliedDiscountLabel, $totalAmount, $finalPricePerTicket, $raceCapacity, $routeChoices, $distinctRoutes, $requestWaitlist, &$isWaitlist) {
+            $isWaitlist = $requestWaitlist || ! $raceCapacity->canReserve($routeChoices, lock: true);
+
+            if ($isWaitlist && count($distinctRoutes) > 1) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'tickets' => 'Nel frattempo una delle distanze selezionate è diventata sold out. Invia separatamente le richieste per la lista d’attesa.',
+                ]);
+            }
 
             $order = Order::create([
-                'group_code' => 'WFU_' . strtoupper(\Illuminate\Support\Str::random(10)),
-                'total_amount' => $totalAmount,
-                'payment_method' => $validatedData['payment_method'],
+                'group_code' => ($isWaitlist ? 'WAIT_' : 'WFU_') . strtoupper(\Illuminate\Support\Str::random(10)),
+                'total_amount' => $isWaitlist ? 0 : $totalAmount,
+                'payment_method' => $isWaitlist ? 'waitlist' : $validatedData['payment_method'],
                 'is_sports_association' => $request->has('is_sports_association'),
                 'association_name' => $validatedData['association_name'] ?? null,
                 'discount_code' => $appliedDiscountLabel,
-                'status' => 'pending',
+                'status' => $isWaitlist ? 'waitlist' : 'pending',
             ]);
 
             foreach ($validatedData['tickets'] as $index => $data) {
@@ -96,14 +113,18 @@ class CheckoutController extends Controller
 
                 $order->tickets()->create(array_merge($data, [
                     'unique_ticket_code' => null,
-                    'price_paid' => $ticketPrice,
-                    'payment_tag' => ucfirst($validatedData['payment_method']),
-                    'status' => 'pending',
+                    'price_paid' => $isWaitlist ? 0 : $ticketPrice,
+                    'payment_tag' => $isWaitlist ? 'Lista d’attesa' : ucfirst($validatedData['payment_method']),
+                    'status' => $isWaitlist ? 'waitlist' : 'pending',
                 ]));
             }
 
             return $order;
         });
+
+        if ($isWaitlist) {
+            return redirect()->route('waitlist.confirmation', ['order_code' => $order->group_code]);
+        }
 
         // 5. Redirect Pagamento
         if ($totalAmount == 0) {
@@ -185,6 +206,32 @@ class CheckoutController extends Controller
 
         return redirect()->route('iscrizione')
             ->withErrors(['payment_method' => 'Pagamento annullato. I posti riservati sono stati nuovamente liberati.']);
+    }
+
+    public function waitlistConfirmation(string $order_code)
+    {
+        $order = Order::with('tickets')
+            ->where('group_code', $order_code)
+            ->where('status', 'waitlist')
+            ->firstOrFail();
+
+        $positions = $order->tickets->mapWithKeys(function (Ticket $ticket) {
+            $position = Ticket::query()
+                ->where('status', 'waitlist')
+                ->where('route_choice', $ticket->route_choice)
+                ->where(function ($query) use ($ticket) {
+                    $query->where('created_at', '<', $ticket->created_at)
+                        ->orWhere(function ($query) use ($ticket) {
+                            $query->where('created_at', $ticket->created_at)
+                                ->where('id', '<=', $ticket->id);
+                        });
+                })
+                ->count();
+
+            return [$ticket->id => $position];
+        });
+
+        return view('checkout.waitlist-confirmation', compact('order', 'positions'));
     }
 
     private function createOrRetrieveStripePaymentIntent(Order $order)
