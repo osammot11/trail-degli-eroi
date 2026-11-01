@@ -30,6 +30,16 @@
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">{{ session('success') }}</div>
         @endif
 
+        @if($errors->any())
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                <ul class="list-disc pl-5">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <div>
             <div class="grid-3">
                 <div class="bg-white p-6 rounded-lg shadow">
@@ -72,6 +82,53 @@
                         Esporta CSV
                     </a>
                 </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow top-margin-large">
+                <div class="flex flex-wrap items-start justify-between gap-6 border-b pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold">Capienza delle distanze</h2>
+                        <p class="text-sm text-gray-500 mt-1">Imposta 0 per non applicare alcun limite. Al raggiungimento della capienza la distanza diventa automaticamente sold out.</p>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-wide bg-gray-100 text-gray-600 px-3 py-2 rounded">Aggiornamento in tempo reale</span>
+                </div>
+
+                <form action="{{ route('admin.update_race_capacities') }}" method="POST">
+                    @csrf
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                        @foreach($raceAvailability as $race)
+                            <div class="border rounded-lg p-4 {{ $race['is_sold_out'] ? 'border-red-300 bg-red-50' : 'border-gray-200' }}">
+                                <div class="flex justify-between gap-3 mb-3">
+                                    <div>
+                                        <h3 class="font-bold text-base">{{ $race['label'] }}</h3>
+                                        <p class="text-xs text-gray-500">{{ $race['distance'] }}</p>
+                                    </div>
+                                    <span class="text-xs font-bold {{ $race['is_sold_out'] ? 'text-red-600' : 'text-green-700' }}">
+                                        {{ $race['is_sold_out'] ? 'SOLD OUT' : ($race['is_unlimited'] ? 'SENZA LIMITE' : $race['remaining'].' LIBERI') }}
+                                    </span>
+                                </div>
+
+                                <div class="h-2 bg-gray-200 rounded overflow-hidden mb-3">
+                                    <div class="h-full {{ $race['is_sold_out'] ? 'bg-red-600' : 'bg-green-600' }}" style="width: {{ $race['percentage'] }}%"></div>
+                                </div>
+
+                                <p class="text-sm mb-3"><strong>{{ $race['occupied'] }}</strong> posti occupati</p>
+                                <label class="block text-xs text-gray-500 mb-1" for="{{ $race['capacity_key'] }}">Capienza massima</label>
+                                <input
+                                    id="{{ $race['capacity_key'] }}"
+                                    type="number"
+                                    min="0"
+                                    max="100000"
+                                    name="{{ $race['capacity_key'] }}"
+                                    value="{{ old($race['capacity_key'], $race['capacity']) }}"
+                                    class="border p-2 rounded w-full"
+                                    required
+                                >
+                            </div>
+                        @endforeach
+                    </div>
+                    <button type="submit" class="mt-5 bg-red-700 text-white font-bold py-3 px-6 rounded hover:bg-red-800">Salva capienze</button>
+                </form>
             </div>
 
             <div class="col-span-3 top-margin-large">

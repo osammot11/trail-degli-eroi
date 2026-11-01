@@ -10,11 +10,14 @@ use Illuminate\Support\Str;
 use App\Jobs\SendTicketEmail;
 use Illuminate\Support\Facades\File;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\RaceCapacityService;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class AdminController extends Controller
 {
     // --- 1. Dashboard con Filtri di Ricerca ---
-    public function dashboard(Request $request)
+    public function dashboard(Request $request, RaceCapacityService $raceCapacity)
     {
         $query = \App\Models\Ticket::with('order')->where('status', 'active');
 
@@ -40,8 +43,9 @@ class AdminController extends Controller
         $activeTickets = $query->orderBy('created_at', 'desc')->get();
         $currentPrice = \App\Models\Setting::where('key', 'ticket_price')->value('value') ?? 26.00;
         $totalRevenue = $activeTickets->sum('price_paid');
+        $raceAvailability = $raceCapacity->availability();
 
-        return view('admin.dashboard', compact('activeTickets', 'currentPrice', 'totalRevenue'));
+        return view('admin.dashboard', compact('activeTickets', 'currentPrice', 'totalRevenue', 'raceAvailability'));
     }
 
     // --- 2. Esportazione CSV (Il Super CSV Completo, Filtrato e TUTTO MAIUSCOLO) ---
@@ -180,6 +184,28 @@ class AdminController extends Controller
         return back()->with('success', 'Prezzo base aggiornato con successo!');
     }
 
+    public function updateRaceCapacities(Request $request)
+    {
+        $rules = [];
+
+        foreach (RaceCapacityService::RACES as $race) {
+            $rules[$race['capacity_key']] = ['required', 'integer', 'min:0', 'max:100000'];
+        }
+
+        $validated = $request->validate($rules);
+
+        DB::transaction(function () use ($validated) {
+            foreach ($validated as $key => $value) {
+                Setting::updateOrCreate(
+                    ['key' => $key],
+                    ['value' => (string) $value]
+                );
+            }
+        });
+
+        return back()->with('success', 'Capienze aggiornate. Le gare al limite vengono chiuse automaticamente.');
+    }
+
     // Mostra la pagina dei biglietti in attesa e il form di upload
     public function pending()
     {
@@ -188,7 +214,7 @@ class AdminController extends Controller
     }
 
     // Processa il file CSV (Versione Completa - Tutti i campi)
-    public function uploadCsv(Request $request)
+    public function uploadCsv(Request $request, RaceCapacityService $raceCapacity)
     {
         $request->validate([
             'csv_file' => 'required|mimes:csv,txt|max:2048',
@@ -222,6 +248,8 @@ class AdminController extends Controller
         ]);
 
         $count = 0;
+        $skippedForCapacity = 0;
+        $skippedInvalidRoute = 0;
         $currentPrice = \App\Models\Setting::where('key', 'ticket_price')->value('value') ?? 26.00;
 
         // 5. Leggiamo riga per riga (Ora con TUTTE le 18 colonne)
@@ -247,14 +275,21 @@ class AdminController extends Controller
                 }
             }
 
-            $order->tickets()->create([
+            $routeChoice = trim($row[3]) ?: 'Trail degli Eroi 46K';
+
+            if (! in_array($routeChoice, $raceCapacity->routeValues(), true)) {
+                $skippedInvalidRoute++;
+                continue;
+            }
+
+            $ticketData = [
                 // Dati Anagrafici Base
                 'first_name' => trim($row[0]) ?: 'Sconosciuto',
                 'last_name' => trim($row[1]) ?: 'Sconosciuto',
                 'email' => trim($row[2]) ?: 'no-email@test.com',
                 
                 // Scelte Maratona
-                'route_choice' => trim($row[3]) ?: 'Trail degli Eroi 46K',
+                'route_choice' => $routeChoice,
                 'tshirt_size' => trim($row[9]) ?: 'L',
                 
                 // Dati di Nascita e Documenti
@@ -280,13 +315,32 @@ class AdminController extends Controller
                 'price_paid' => $currentPrice,
                 'payment_tag' => 'Importato CSV',
                 'status' => 'in-approvazione', 
-            ]);
-            $count++;
+            ];
+
+            try {
+                DB::transaction(function () use ($raceCapacity, $routeChoice, $order, $ticketData) {
+                    $raceCapacity->assertCanReserve([$routeChoice]);
+                    $order->tickets()->create($ticketData);
+                });
+                $count++;
+            } catch (\Illuminate\Validation\ValidationException) {
+                $skippedForCapacity++;
+            }
         }
 
         fclose($handle);
 
-        return back()->with('success', "$count biglietti caricati con tutti i dettagli e messi in attesa di approvazione.");
+        $message = "$count biglietti caricati e messi in attesa di approvazione.";
+
+        if ($skippedForCapacity > 0) {
+            $message .= " $skippedForCapacity righe saltate perché la distanza era sold out.";
+        }
+
+        if ($skippedInvalidRoute > 0) {
+            $message .= " $skippedInvalidRoute righe saltate perché la distanza non era riconosciuta.";
+        }
+
+        return back()->with('success', $message);
     }
 
     // Approva il singolo biglietto e invia l'email
@@ -323,13 +377,13 @@ class AdminController extends Controller
     }
 
     // Salva il biglietto manuale e spedisce l'email
-    public function storeTicket(Request $request)
+    public function storeTicket(Request $request, RaceCapacityService $raceCapacity)
     {
         // 1. Validazione
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'route_choice' => 'required|in:Trail degli Eroi 46K,Sky degli Eroi 27K,Downhill degli Eroi 12K,Santa Felicita 14K',
+            'route_choice' => ['required', Rule::in($raceCapacity->routeValues())],
             'dob' => 'required|date',
             'birth_place' => 'required|string|max:255',
             'residence_address' => 'required|string|max:255',
@@ -357,20 +411,22 @@ class AdminController extends Controller
             'price_paid' => 'required|numeric|min:0', // <-- NUOVO CAMPO IMPORTI
         ]);
 
-        // 2. Creiamo un ordine fittizio con l'importo corretto
-        $order = Order::create([
-            'group_code' => 'MAN_' . strtoupper(Str::random(8)),
-            'total_amount' => $validated['price_paid'], // Salviamo l'incasso
-            'payment_method' => 'manual',
-            'status' => 'paid',
-        ]);
+        $ticket = DB::transaction(function () use ($validated, $raceCapacity) {
+            $raceCapacity->assertCanReserve([$validated['route_choice']]);
 
-        // 3. Creiamo il biglietto (Laravel prenderà 'price_paid' direttamente da $validated)
-        $ticket = $order->tickets()->create(array_merge($validated, [
-            'payment_tag' => 'Contanti / Manuale',
-            'status' => 'active', 
-            'unique_ticket_code' => 'TK_' . strtoupper(Str::random(8)) 
-        ]));
+            $order = Order::create([
+                'group_code' => 'MAN_' . strtoupper(Str::random(8)),
+                'total_amount' => $validated['price_paid'],
+                'payment_method' => 'manual',
+                'status' => 'paid',
+            ]);
+
+            return $order->tickets()->create(array_merge($validated, [
+                'payment_tag' => 'Contanti / Manuale',
+                'status' => 'active',
+                'unique_ticket_code' => 'TK_' . strtoupper(Str::random(8)),
+            ]));
+        });
 
         // 4. Invio email in background
         SendTicketEmail::dispatch($ticket);

@@ -13,6 +13,24 @@
         <h1 class="center-text">Iscrizione Trail degli Eroi</h1>
         <p class="center-text">Scegli la tua sfida sul Monte Grappa.</p>
 
+        <div class="race-availability-grid" id="race-availability" aria-live="polite">
+            @foreach($raceAvailability as $race)
+                <div class="race-availability-card {{ $race['is_sold_out'] ? 'is-sold-out' : '' }}" data-race-card="{{ $race['route'] }}">
+                    <span>{{ $race['distance'] }}</span>
+                    <strong>{{ $race['label'] }}</strong>
+                    <small data-race-status>
+                        @if($race['is_unlimited'])
+                            Iscrizioni aperte
+                        @elseif($race['is_sold_out'])
+                            Sold out
+                        @else
+                            {{ $race['remaining'] }} posti disponibili
+                        @endif
+                    </small>
+                </div>
+            @endforeach
+        </div>
+
         <form action="{{ route('checkout.store') }}" method="POST" id="marathon-form">
             @if($errors->any())
                 <div class="bg-primary-hover">
@@ -54,12 +72,18 @@
 
                         <div class="label-box">
                             <label>Scelta del percorso</label>
-                            <select name="tickets[0][route_choice]" required>
+                            <select name="tickets[0][route_choice]" class="route-choice-select" required>
                                 <option value="">Scegli la gara</option>
-                                <option value="Trail degli Eroi 46K" {{ request('percorso') == 'Trail degli Eroi 46K' ? 'selected' : '' }}>Trail degli Eroi — 46 km / 2.500 D+</option>
-                                <option value="Sky degli Eroi 27K" {{ request('percorso') == 'Sky degli Eroi 27K' ? 'selected' : '' }}>Sky degli Eroi — 27 km / 1.700 D+</option>
-                                <option value="Downhill degli Eroi 12K" {{ request('percorso') == 'Downhill degli Eroi 12K' ? 'selected' : '' }}>Downhill degli Eroi — 12 km / 1.500 D-</option>
-                                <option value="Santa Felicita 14K" {{ request('percorso') == 'Santa Felicita 14K' ? 'selected' : '' }}>Santa Felicita — 14 km / 800 D+</option>
+                                @foreach($raceAvailability as $race)
+                                    <option
+                                        value="{{ $race['route'] }}"
+                                        data-base-label="{{ $race['label'] }} — {{ $race['distance'] }}"
+                                        {{ request('percorso') == $race['route'] ? 'selected' : '' }}
+                                        {{ $race['is_sold_out'] && request('percorso') != $race['route'] ? 'disabled' : '' }}
+                                    >
+                                        {{ $race['label'] }} — {{ $race['distance'] }}{{ $race['is_sold_out'] ? ' — SOLD OUT' : ($race['is_unlimited'] ? '' : ' — '.$race['remaining'].' posti') }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -191,6 +215,55 @@
     </div>
 
     <script>
+        const availabilityUrl = @json(route('race.availability'));
+        let liveRaceAvailability = @json($raceAvailability);
+
+        function availabilityLabel(race) {
+            if (race.is_unlimited) return 'Iscrizioni aperte';
+            if (race.is_sold_out) return 'Sold out';
+            return `${race.remaining} posti disponibili`;
+        }
+
+        function renderAvailability(races) {
+            liveRaceAvailability = races;
+
+            Object.entries(races).forEach(([route, race]) => {
+                const card = document.querySelector(`[data-race-card="${CSS.escape(route)}"]`);
+                if (card) {
+                    card.classList.toggle('is-sold-out', race.is_sold_out);
+                    card.querySelector('[data-race-status]').textContent = availabilityLabel(race);
+                }
+            });
+
+            document.querySelectorAll('.route-choice-select').forEach(select => {
+                Array.from(select.options).forEach(option => {
+                    if (!option.value || !races[option.value]) return;
+
+                    const race = races[option.value];
+                    const baseLabel = option.dataset.baseLabel || option.textContent.split(' — SOLD OUT')[0];
+                    option.dataset.baseLabel = baseLabel;
+                    option.textContent = `${baseLabel}${race.is_sold_out ? ' — SOLD OUT' : (race.is_unlimited ? '' : ` — ${race.remaining} posti`)}`;
+                    option.disabled = race.is_sold_out && select.value !== option.value;
+                });
+            });
+        }
+
+        async function refreshAvailability() {
+            try {
+                const response = await fetch(availabilityUrl, {
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store',
+                });
+
+                if (!response.ok) return;
+
+                const payload = await response.json();
+                renderAvailability(payload.races);
+            } catch (error) {
+                // Il controllo definitivo viene sempre ripetuto dal server al checkout.
+            }
+        }
+
         // --- 1. DATI GEOGRAFICI ---
         const italyLocations = {
             "Abruzzo": ["Chieti", "L'Aquila", "Pescara", "Teramo"],
@@ -354,6 +427,8 @@
             const firstBlock = document.querySelector('.ticket-block');
             populateRegions(firstBlock);
             updateTotal();
+            renderAvailability(liveRaceAvailability);
+            window.setInterval(refreshAvailability, 30000);
         });
     </script>
 </body>

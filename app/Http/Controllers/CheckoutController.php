@@ -5,17 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Ticket;
 use App\Services\OrderPaymentFinalizer;
+use App\Services\RaceCapacityService;
 use Illuminate\Http\Request;
 use Srmklive\PayPal\Services\PayPal as PayPalClient;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use RuntimeException;
 use Throwable;
 
 class CheckoutController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request, RaceCapacityService $raceCapacity)
     {
         // 1. Validazione massiccia
         $validatedData = $request->validate([
@@ -27,7 +29,7 @@ class CheckoutController extends Controller
             'tickets.*.first_name' => 'required|string|max:255',
             'tickets.*.last_name' => 'required|string|max:255',
             'tickets.*.codice_fiscale' => 'nullable|string|max:16', 
-            'tickets.*.route_choice' => 'required|in:Trail degli Eroi 46K,Sky degli Eroi 27K,Downhill degli Eroi 12K,Santa Felicita 14K',
+            'tickets.*.route_choice' => ['required', Rule::in($raceCapacity->routeValues())],
             'tickets.*.dob' => 'required|date',
             'tickets.*.birth_place' => 'required|string|max:255',
             'tickets.*.residence_address' => 'required|string|max:255',
@@ -74,7 +76,9 @@ class CheckoutController extends Controller
         }
 
         // 3. Creazione Ordine e Biglietti
-        $order = DB::transaction(function () use ($request, $validatedData, $appliedDiscountLabel, $totalAmount, $finalPricePerTicket) {
+        $order = DB::transaction(function () use ($request, $validatedData, $appliedDiscountLabel, $totalAmount, $finalPricePerTicket, $raceCapacity) {
+            $raceCapacity->assertCanReserve(array_column($validatedData['tickets'], 'route_choice'));
+
             $order = Order::create([
                 'group_code' => 'WFU_' . strtoupper(\Illuminate\Support\Str::random(10)),
                 'total_amount' => $totalAmount,
@@ -169,6 +173,18 @@ class CheckoutController extends Controller
             'clientSecret' => $paymentIntent->client_secret,
             'stripeKey' => config('services.stripe.key'),
         ]);
+    }
+
+    public function cancel(string $order)
+    {
+        $orderModel = Order::where('group_code', $order)->first();
+
+        if ($orderModel && $orderModel->status === 'pending') {
+            $orderModel->update(['status' => 'cancelled']);
+        }
+
+        return redirect()->route('iscrizione')
+            ->withErrors(['payment_method' => 'Pagamento annullato. I posti riservati sono stati nuovamente liberati.']);
     }
 
     private function createOrRetrieveStripePaymentIntent(Order $order)

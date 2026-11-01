@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CheckoutController;
 use App\Models\Setting;
 use App\Http\Controllers\PageController;
+use App\Services\RaceCapacityService;
 
 // Rotta per inviare i dati del modulo (POST)
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
@@ -15,15 +16,12 @@ Route::get('/checkout/{order_code}/payment', [CheckoutController::class, 'paymen
 Route::get('/checkout/success/{order_code}', [CheckoutController::class, 'success'])->name('checkout.success');
 
 // Rotta per il ritorno in caso di ANNULLAMENTO (GET)
-Route::get('/checkout/cancel/{order}', function($order) {
-    // Per ora lasciamo un testo semplice, poi potremo fare una pagina dedicata
-    return "Pagamento annullato per l'ordine: " . $order; 
-})->name('checkout.cancel');
+Route::get('/checkout/cancel/{order}', [CheckoutController::class, 'cancel'])->name('checkout.cancel');
 
 // Rotta per il download on-demand del singolo biglietto PDF (GET)
 Route::get('/ticket/{unique_code}/download', [CheckoutController::class, 'downloadTicket'])->name('ticket.download');
 
-Route::get('/iscrizione', function () {
+Route::get('/iscrizione', function (RaceCapacityService $raceCapacity) {
     // Recuperiamo il prezzo dal database, con il paracadute a 28€ se non esiste
     try {
         $currentPrice = Setting::where('key', 'ticket_price')->value('value') ?? 28.00;
@@ -31,9 +29,17 @@ Route::get('/iscrizione', function () {
         $currentPrice = 28.00;
     }
 
-    // Passiamo la variabile alla vista welcome
-    return view('welcome', compact('currentPrice'));
+    $raceAvailability = $raceCapacity->availability();
+
+    return view('welcome', compact('currentPrice', 'raceAvailability'));
 })->name('iscrizione');
+
+Route::get('/api/race-availability', function (RaceCapacityService $raceCapacity) {
+    return response()->json([
+        'races' => $raceCapacity->availability(),
+        'updated_at' => now()->toIso8601String(),
+    ]);
+})->name('race.availability');
 
 Route::redirect('/ticketing', '/iscrizione', 301);
 Route::redirect('/ticketing/index.php', '/iscrizione', 301);
@@ -56,6 +62,7 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::post('/admin/price', [AdminController::class, 'updatePrice'])->name('admin.update_price');
+    Route::post('/admin/race-capacities', [AdminController::class, 'updateRaceCapacities'])->name('admin.update_race_capacities');
     
     Route::get('/admin/pending', [AdminController::class, 'pending'])->name('admin.pending');
     Route::post('/admin/upload-csv', [AdminController::class, 'uploadCsv'])->name('admin.upload_csv');
